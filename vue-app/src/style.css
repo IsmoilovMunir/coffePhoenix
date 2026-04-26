@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --brand-green: #093333;
+  --brand-ivory: #eee9e3;
+  --brand-beige: #e4c49e;
+  --brand-graphite: #20201f;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+  font-family: Candara, 'Philosopher', Inter, Arial, sans-serif;
+}
+
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.home h1 {
+  margin: 0;
+}
+
+.home p {
+  margin: 0;
+}
+
+.cta {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #101010;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Страница франшизы: без лишнего скролла/оверскролла родителя — скролл только внутри iframe */
+html:has(.franchise-page),
+html:has(.franchise-page) body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html:has(.franchise-page) #app {
+  height: 100%;
+  overflow: hidden;
+}
+
+.franchise-page {
+  height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--brand-green);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.custom-header {
+  height: 84px;
+  flex: 0 0 84px;
+  padding: 0 16px;
+  background: #eee9e3;
+  border-bottom: 1px solid rgba(9, 51, 51, 0.12);
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 10px 26px rgba(32, 32, 31, 0.1);
+}
+
+.custom-header-inner {
+  width: min(1240px, 100%);
+  height: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  align-items: center;
+  gap: clamp(12px, 2vw, 28px);
+}
+
+.custom-logo {
+  width: 220px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+.custom-logo img {
+  display: block;
+  height: 64px;
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(15%) sepia(27%) saturate(939%)
+    hue-rotate(131deg) brightness(93%) contrast(99%);
+}
+
+.custom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border-radius: 14px;
+  background: #eee9e3;
+  border: 1px solid rgba(9, 51, 51, 0.1);
+}
+
+.custom-nav a {
+  text-decoration: none;
+  color: var(--brand-green);
+  font-family: 'Philosopher', Candara, 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.custom-nav a:hover {
+  background: rgba(9, 51, 51, 0.1);
+  color: #062626;
+  transform: translateY(-1px);
+}
+
+.custom-cta {
+  justify-self: end;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand-green);
+  color: var(--brand-ivory);
+  font-weight: 600;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.custom-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(9, 51, 51, 0.22);
+  background: #093333;
+  color: #eee9e3;
+}
+
+@media (max-width: 980px) {
+  .custom-header {
+    height: 72px;
+    flex-basis: 72px;
+  }
+
+  .custom-header-inner {
+    grid-template-columns: 180px minmax(0, 1fr) 180px;
+  }
+
+  .custom-logo img {
+    height: 52px;
+  }
+
+  .custom-nav a {
+    font-size: 14px;
+  }
+
+  .custom-cta {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 760px) {
+  .custom-header-inner {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+  }
+
+  .custom-logo {
+    width: auto;
+  }
+
+  .custom-logo img {
+    height: 44px;
+  }
+
+  .custom-nav {
+    display: none;
+  }
+}
+
+.legacy-shell {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.legacy-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.legacy-frame.legacy-frame-ready {
+  opacity: 1;
+}
