@@ -576,6 +576,182 @@ const applyHeroBackground = (event) => {
       color: var(--feniks-ivory) !important;
     }
 
+    /* Bitrix24 форма в блоке контактов: жёсткий адаптив */
+    #contacts .b24-form,
+    #contacts .b24-form-dark,
+    #contacts .b24-form-wrapper,
+    #contacts .b24-form-content,
+    #contacts .b24-form-padding-side,
+    #contacts .b24-form-state-container,
+    #contacts form {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    #contacts .b24-form-wrapper {
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 10px 24px rgba(9, 51, 51, 0.18) !important;
+    }
+    #contacts .b24-form-content {
+      padding: 18px !important;
+    }
+    #contacts .b24-form-field {
+      margin-bottom: 12px !important;
+    }
+    #contacts .b24-form-control-container {
+      width: 100% !important;
+    }
+    #contacts .b24-form-control {
+      width: 100% !important;
+      min-height: 50px !important;
+      height: 50px !important;
+      border-radius: 12px !important;
+      padding: 14px 14px !important;
+      font-size: 16px !important; /* iOS: без auto-zoom */
+      line-height: 1.25 !important;
+      box-sizing: border-box !important;
+      border: 1px solid rgba(9, 51, 51, 0.24) !important;
+      background: #fff !important;
+      color: #20201f !important;
+    }
+    #contacts .b24-form-control-label {
+      line-height: 1.2 !important;
+      font-size: 13px !important;
+      max-width: calc(100% - 20px) !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    #contacts .b24-form-field-agreement label {
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    #contacts .b24-form-field-agreement input[type='checkbox'] {
+      margin-top: 2px !important;
+      flex: 0 0 auto !important;
+    }
+    #contacts .b24-form-field-agreement .b24-form-control-desc {
+      display: inline-block !important;
+      font-size: 12px !important;
+      line-height: 1.35 !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+    }
+    #contacts .b24-form-btn-container,
+    #contacts .b24-form-btn-block,
+    #contacts .b24-form-btn {
+      width: 100% !important;
+    }
+    #contacts .b24-form-btn {
+      min-height: 50px !important;
+      border-radius: 12px !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      background: #093333 !important;
+      color: #eee9e3 !important;
+      border: 1px solid #093333 !important;
+    }
+    #contacts .b24-form-recaptcha,
+    #contacts .grecaptcha-badge {
+      max-width: 100% !important;
+      overflow: hidden !important;
+    }
+
+    /* Кастомная форма заявки (вместо Bitrix) */
+    #contacts .feniks-form-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #eee9e3;
+      border: 1px solid rgba(9, 51, 51, 0.2);
+      border-radius: 18px;
+      padding: clamp(16px, 2vw, 26px);
+      box-shadow: 0 14px 30px rgba(9, 51, 51, 0.18);
+    }
+    #contacts .feniks-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    #contacts .feniks-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    #contacts .feniks-form-field label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #093333;
+    }
+    #contacts .feniks-form-field input {
+      min-height: 48px;
+      border-radius: 12px;
+      border: 1px solid rgba(9, 51, 51, 0.24);
+      background: #fff;
+      color: #20201f;
+      padding: 12px 14px;
+      font-size: 16px;
+      line-height: 1.25;
+      box-sizing: border-box;
+    }
+    #contacts .feniks-form-field input:focus {
+      outline: 2px solid rgba(9, 51, 51, 0.22);
+      outline-offset: 1px;
+      border-color: #093333;
+    }
+    #contacts .feniks-form-field.feniks-form-full {
+      grid-column: 1 / -1;
+    }
+    #contacts .feniks-form-note {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(32, 32, 31, 0.85);
+    }
+    #contacts .feniks-form-submit {
+      margin-top: 14px;
+      width: 100%;
+      min-height: 50px;
+      border-radius: 12px;
+      border: 1px solid #093333;
+      background: #093333;
+      color: #eee9e3;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #contacts .feniks-form-submit:hover {
+      background: #0d4343;
+    }
+    @media (max-width: 743px) {
+      #contacts [class*="Form_Inner"] {
+        padding-inline: 12px !important;
+      }
+      #contacts .b24-form-content {
+        padding: 14px !important;
+      }
+      #contacts .b24-form-control {
+        min-height: 48px !important;
+        height: 48px !important;
+        padding: 12px !important;
+      }
+      #contacts .b24-form-btn {
+        min-height: 48px !important;
+      }
+      #contacts .feniks-form-shell {
+        border-radius: 14px;
+        padding: 14px;
+      }
+      #contacts .feniks-form-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      #contacts .feniks-form-submit {
+        min-height: 48px;
+      }
+    }
+
     [class*="MarqueeBlock_Item"] {
       color: var(--feniks-green) !important;
     }
@@ -754,7 +930,11 @@ const applyHeroBackground = (event) => {
 
     /* Убираем блок App Store / Google Play / соцсети One Price из футера */
     [class*="DesktopFooter_AppsAndSocials"],
-    [class*="MobileFooter_AppsAndSocials"] {
+    [class*="MobileFooter_AppsAndSocials"],
+    [class*="TabletMobileFooter_Apps"],
+    [class*="TabletMobileFooter_Bottom__"],
+    [class*="TabletMobileFooter_License__"],
+    [class*="TabletMobileFooter_Socials__"] {
       display: none !important;
     }
 
@@ -1450,6 +1630,52 @@ const applyHeroBackground = (event) => {
     if (calcEl) calcEl.id = 'calculator'
   }
 
+  const replaceContactsForm = () => {
+    const formWrap = doc.querySelector('#contacts')
+    if (!formWrap || formWrap.dataset.feniksFormReplaced === '1') return
+    const inner = formWrap.querySelector('[class*="Form_Inner"]')
+    if (!inner) return
+
+    inner.innerHTML = `
+      <div class="Form_Title__w4lDR">Заявка на франшизу</div>
+      <div class="feniks-form-shell">
+        <form class="feniks-lead-form" novalidate>
+          <div class="feniks-form-grid">
+            <div class="feniks-form-field feniks-form-full">
+              <label for="feniks-fullname">ФИО</label>
+              <input id="feniks-fullname" name="fullName" type="text" required placeholder="Введите ФИО" />
+            </div>
+            <div class="feniks-form-field">
+              <label for="feniks-phone">Телефон</label>
+              <input id="feniks-phone" name="phone" type="tel" required placeholder="+7 (___) ___-__-__" />
+            </div>
+            <div class="feniks-form-field">
+              <label for="feniks-email">E-mail</label>
+              <input id="feniks-email" name="email" type="email" required placeholder="example@mail.ru" />
+            </div>
+            <div class="feniks-form-field feniks-form-full">
+              <label for="feniks-city">Город</label>
+              <input id="feniks-city" name="city" type="text" required placeholder="Введите город" />
+            </div>
+          </div>
+          <div class="feniks-form-note">
+            Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
+          </div>
+          <button class="feniks-form-submit" type="submit">Отправить</button>
+        </form>
+      </div>
+    `
+
+    const form = inner.querySelector('.feniks-lead-form')
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault()
+      form.reset()
+      const msg = doc.defaultView?.alert
+      if (msg) msg('Спасибо! Ваша заявка отправлена.')
+    })
+    formWrap.dataset.feniksFormReplaced = '1'
+  }
+
   const footerMenuNeedsPatch = (menuEl) =>
     !menuEl.querySelector('.feniks-footer-nav-ul a[href="#contacts"]')
 
@@ -1592,6 +1818,9 @@ const applyHeroBackground = (event) => {
   setTimeout(patchFooter, 300)
   setTimeout(patchFooter, 1200)
   setupFooterContactObserver()
+  replaceContactsForm()
+  setTimeout(replaceContactsForm, 500)
+  setTimeout(replaceContactsForm, 1500)
 
   requestAnimationFrame(() => {
     frameReady.value = true
