@@ -1,23 +1,23 @@
 <script setup>
 import { ref, computed } from "vue";
-import espressoImg from "../assets/img/эспрессо.png";
-import americanoImg from "../assets/img/Американо.png";
-import cappuccinoImg from "../assets/img/Капучино.png";
-import latteImg from "../assets/img/Латте.png";
-import flatWhiteImg from "../assets/img/Флэт-уайт.png";
-import rafImg from "../assets/img/Раф.png";
-import mocaccinoImg from "../assets/img/Моккачино.png";
-import hotChocolateImg from "../assets/img/Моккачино.png";
-import seaBuckthornImg from "../assets/img/Облипиха.png";
-import raspberryMulledImg from "../assets/img/малиновый.png";
-import lingonberryJasmineTeaImg from "../assets/img/чай брусника.png";
-import berryIceTeaImg from "../assets/img/ягодный айс-ти.png";
-import classicBerryTeaImg from "../assets/img/Ягодный чай.png";
-import berryCardamomImg from "../assets/img/Ягодный с кардамоном.png";
-import jasmineRafImg from "../assets/img/Раф Жасминовый.png";
-import mapleRafImg from "../assets/img/кленовый раф.png";
-import meltingLatteImg from "../assets/img/Лате Тающиц.png";
-import berryMintMocaccinoImg from "../assets/img/Моккачино ягодно.png";
+import espressoImg from "../assets/img/espresso.png";
+import americanoImg from "../assets/img/americano.png";
+import cappuccinoImg from "../assets/img/cappuccino.png";
+import latteImg from "../assets/img/latte.png";
+import flatWhiteImg from "../assets/img/flat-white.png";
+import rafImg from "../assets/img/raf.png";
+import mocaccinoImg from "../assets/img/mocaccino.png";
+import hotChocolateImg from "../assets/img/mocaccino.png";
+import seaBuckthornImg from "../assets/img/sea-buckthorn.png";
+import raspberryMulledImg from "../assets/img/raspberry-mulled.png";
+import lingonberryJasmineTeaImg from "../assets/img/lingonberry-jasmine-tea.png";
+import berryIceTeaImg from "../assets/img/berry-ice-tea.png";
+import classicBerryTeaImg from "../assets/img/classic-berry-tea.png";
+import berryCardamomImg from "../assets/img/berry-cardamom.png";
+import jasmineRafImg from "../assets/img/jasmine-raf.png";
+import mapleRafImg from "../assets/img/maple-raf.png";
+import meltingLatteImg from "../assets/img/melting-latte.png";
+import berryMintMocaccinoImg from "../assets/img/berry-mint-mocaccino.png";
 
 const activeTab = ref("coffee");
 
