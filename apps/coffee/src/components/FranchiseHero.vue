@@ -10,7 +10,7 @@
       </p>
       <a
         class="btn btn--light"
-        href="http://localhost:5174"
+        href="https://partniers.coffeephoenix.ru"
         target="_blank"
         rel="noopener noreferrer"
       >
