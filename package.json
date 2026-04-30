@@ -1,0 +1,21 @@
+{
+  "name": "coffee-phenix-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/coffee",
+    "apps/partners",
+    "apps/partners-v2"
+  ],
+  "scripts": {
+    "dev:coffee": "npm run dev -w apps/coffee",
+    "dev:partners": "npm run dev -w apps/partners",
+    "dev:partners-v2": "npm run dev -w apps/partners-v2 -- --port 5175",
+    "build:coffee": "npm run build -w apps/coffee",
+    "build:partners": "npm run build -w apps/partners",
+    "build:partners-v2": "npm run build -w apps/partners-v2",
+    "build": "npm run build:coffee && npm run build:partners",
+    "preview:coffee": "npm run preview -w apps/coffee",
+    "preview:partners": "npm run preview -w apps/partners",
+    "preview:partners-v2": "npm run preview -w apps/partners-v2"
+  }
+}
