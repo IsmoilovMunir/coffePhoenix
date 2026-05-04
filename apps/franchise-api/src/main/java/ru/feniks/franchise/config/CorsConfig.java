@@ -27,6 +27,10 @@ public class CorsConfig {
         List<String> patterns = new ArrayList<>();
         patterns.add("http://localhost:*");
         patterns.add("http://127.0.0.1:*");
+        // Прод без .env: поддомены и основной сайт (иначе POST с https://partniers… → 403 CORS).
+        patterns.add("https://*.coffeephoenix.ru");
+        patterns.add("https://coffeephoenix.ru");
+        patterns.add("https://www.coffeephoenix.ru");
         Arrays.stream(allowedOriginsRaw.split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
