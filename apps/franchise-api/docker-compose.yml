@@ -1,0 +1,13 @@
+# На сервере: cp .env.example .env && отредактируйте .env, затем:
+#   docker compose up -d --build
+#
+# Снаружи — только nginx → 127.0.0.1:8080 (порт не светим на 0.0.0.0)
+services:
+  franchise-api:
+    build: .
+    image: feniks/franchise-api:local
+    ports:
+      - "127.0.0.1:8080:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
