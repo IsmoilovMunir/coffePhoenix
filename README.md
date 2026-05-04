@@ -98,3 +98,5 @@ sudo ln -sf /etc/nginx/sites-available/partniers.coffeephoenix.ru.conf /etc/ngin
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d partniers.coffeephoenix.ru
 ```
+
+Если **https://partniers.coffeephoenix.ru** всё равно показывает **coffee**: на **443** нет своего `server` с `server_name partniers…` (или в нём нет `location /api/`). Запустите **`certbot`** для поддомена как выше, затем **`sudo nginx -T`** и убедитесь, что для **443** у partniers те же **`root …/partniers/dist`** и **`location ^~ /api/`**, что и в репозиторном `deploy/nginx/partniers.coffeephoenix.ru.conf`. При ручном SSL не копируйте только редирект с 80 — нужен полноценный `server { listen 443 ssl; … }`.
