@@ -8,17 +8,21 @@ fi
 
 APP_KEY="$1"
 
+# Один сервер для обоих доменов (как у DNS A на 93.183…). Для второго сервера:
+#   COFFEE_DEPLOY_HOST=… PARTNIERS_DEPLOY_HOST=… ./scripts/deploy-static.sh partniers
+DEFAULT_DEPLOY_HOST="${DEFAULT_DEPLOY_HOST:-93.183.83.197}"
+
 case "$APP_KEY" in
   coffee)
     APP_PATH="apps/coffee"
     BUILD_CMD="npm run build -w apps/coffee"
-    HOST="93.183.83.197"
+    HOST="${COFFEE_DEPLOY_HOST:-$DEFAULT_DEPLOY_HOST}"
     REMOTE_DIR="/var/www/coffeephoenix/coffee"
     ;;
   partniers)
     APP_PATH="apps/partniers"
     BUILD_CMD="npm run build -w apps/partniers"
-    HOST="89.23.99.243"
+    HOST="${PARTNIERS_DEPLOY_HOST:-$DEFAULT_DEPLOY_HOST}"
     REMOTE_DIR="/var/www/coffeephoenix/partniers"
     ;;
   *)
