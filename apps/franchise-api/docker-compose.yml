@@ -1,5 +1,6 @@
 # На сервере: cp .env.example .env && отредактируйте .env, затем:
-#   docker compose up -d --build
+#   docker compose --env-file compose.env up -d --build
+#   (compose.env отключает Bake/buildx-предупреждение; образы — public.ecr.aws, не лимит Hub)
 #
 # Снаружи — только nginx → 127.0.0.1:8080 (порт не светим на 0.0.0.0)
 services:
