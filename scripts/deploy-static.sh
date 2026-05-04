@@ -15,13 +15,14 @@ DEFAULT_DEPLOY_HOST="${DEFAULT_DEPLOY_HOST:-93.183.83.197}"
 case "$APP_KEY" in
   coffee)
     APP_PATH="apps/coffee"
-    BUILD_CMD="npm run build -w apps/coffee"
+    # --prefix: сборка без root workspaces (удобно на сервере до git pull или со старым lockfile).
+    BUILD_CMD="npm --prefix apps/coffee run build"
     HOST="${COFFEE_DEPLOY_HOST:-$DEFAULT_DEPLOY_HOST}"
     REMOTE_DIR="/var/www/coffeephoenix/coffee"
     ;;
   partniers)
     APP_PATH="apps/partniers"
-    BUILD_CMD="npm run build -w apps/partniers"
+    BUILD_CMD="npm --prefix apps/partniers run build"
     HOST="${PARTNIERS_DEPLOY_HOST:-$DEFAULT_DEPLOY_HOST}"
     REMOTE_DIR="/var/www/coffeephoenix/partniers"
     ;;

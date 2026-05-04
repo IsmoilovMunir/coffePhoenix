@@ -53,6 +53,8 @@ docker compose --env-file compose.env up -d --build
 cd apps/franchise-api && docker compose --env-file compose.env up -d --build
 ```
 
+Если на сервере **`git pull`** ругается на **`package-lock.json`**: локально его менял `npm install` — либо **`git checkout -- package-lock.json`** (и при необходимости **`package.json`**) из репо, затем снова `git pull`, либо **`git stash -u`** → `git pull` → разрулить stash.
+
 **Лимит Docker Hub (429 / `toomanyrequests`):** в `Dockerfile` базовые образы — **`public.ecr.aws/docker/library/...`**. Файл **`compose.env`** задаёт `COMPOSE_BAKE=false`, чтобы не было предупреждения про Bake/buildx (альтернатива: пакет `docker-buildx-plugin` или `docker login` на Hub, если снова тянете с `docker.io`).
 
 ## Deploy to Servers
