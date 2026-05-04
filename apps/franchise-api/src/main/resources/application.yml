@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: franchise-api
+  mail:
+    host: ${MAIL_HOST:smtp.timeweb.ru}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        debug: ${MAIL_DEBUG:false}
+        smtp:
+          auth: true
+          auth.mechanisms: PLAIN LOGIN
+          ssl:
+            enable: ${MAIL_SMTP_SSL_ENABLE:true}
+            trust: ${MAIL_SSL_TRUST:${MAIL_HOST:smtp.timeweb.ru}}
+          starttls:
+            enable: ${MAIL_STARTTLS_ENABLE:false}
+            required: false
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+app:
+  mail:
+    to: ${MAIL_TO:}
+    from: ${MAIL_FROM:}
+  cors:
+    # Доп. origin для прода (через запятую). Локально уже разрешены localhost:* и 127.0.0.1:*
+    allowed-origins: ${CORS_ORIGINS:}

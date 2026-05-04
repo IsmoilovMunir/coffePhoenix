@@ -1,12 +1,106 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 
-const frameSrc = `/legacy/html/franchise.html?v=${Date.now()}`
+// Без Date.now(): иначе каждый remount срывает кеш и страница дольше «доезжает».
+const frameSrc = '/legacy/html/franchise.html'
 const frameReady = ref(false)
+const legacyFrameRef = ref(null)
+
+const leadModalOpen = ref(false)
+const leadModalFormRef = ref(null)
+const leadModalFeedback = ref('hidden')
+const leadModalErrorMsg = ref('')
+const leadModalSubmitting = ref(false)
+
+let leadModalEscHandler = null
+
+const closeLeadModal = () => {
+  leadModalOpen.value = false
+}
+
+const openLeadModal = () => {
+  leadModalFeedback.value = 'hidden'
+  leadModalErrorMsg.value = ''
+  leadModalOpen.value = true
+}
+
+watch(leadModalOpen, (open) => {
+  if (open) {
+    leadModalEscHandler = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        closeLeadModal()
+      }
+    }
+    document.addEventListener('keydown', leadModalEscHandler)
+    nextTick(() => {
+      document.getElementById('feniks-modal-fullname')?.focus()
+    })
+  } else if (leadModalEscHandler) {
+    document.removeEventListener('keydown', leadModalEscHandler)
+    leadModalEscHandler = null
+  }
+})
+
+const submitLeadModal = async () => {
+  const form = leadModalFormRef.value
+  if (!form) return
+  if (!form.checkValidity()) {
+    form.reportValidity()
+    return
+  }
+  const fd = new FormData(form)
+  const payload = {
+    fullName: String(fd.get('fullName') ?? '').trim(),
+    phone: String(fd.get('phone') ?? '').trim(),
+    email: String(fd.get('email') ?? '').trim(),
+    city: String(fd.get('city') ?? '').trim(),
+  }
+  const baseUrl = import.meta.env.VITE_FRANCHISE_LEAD_URL
+  const url =
+    typeof baseUrl === 'string' && baseUrl.length > 0 ? baseUrl : '/api/v1/franchise/leads'
+  leadModalFeedback.value = 'hidden'
+  leadModalErrorMsg.value = ''
+  leadModalSubmitting.value = true
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (res.ok) {
+      form.reset()
+      leadModalFeedback.value = 'success'
+      return
+    }
+    let message = 'Попробуйте позже или напишите нам на почту.'
+    try {
+      const err = await res.json()
+      if (err?.message) message = err.message
+    } catch {
+      /* ignore */
+    }
+    leadModalErrorMsg.value = message
+    leadModalFeedback.value = 'error'
+  } catch {
+    leadModalErrorMsg.value = 'Нет связи с сервером. Проверьте подключение к интернету.'
+    leadModalFeedback.value = 'error'
+  } finally {
+    leadModalSubmitting.value = false
+  }
+}
 
 const applyHeroBackground = (event) => {
-  const doc = event?.target?.contentDocument
+  const iframeEl = event?.target
+  const doc = iframeEl?.contentDocument
   if (!doc) return
+
+  // Раньше opacity:1 ставился в самом конце функции — iframe был невидим, пока не отработают все патчи и observer'ы.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      frameReady.value = true
+    })
+  })
 
   const setText = (selectors, value) => {
     selectors.forEach((selector) => {
@@ -653,76 +747,239 @@ const applyHeroBackground = (event) => {
       color: #eee9e3 !important;
       border: 1px solid #093333 !important;
     }
-    #contacts .b24-form-recaptcha,
-    #contacts .grecaptcha-badge {
-      max-width: 100% !important;
+    /* Bitrix / invisible reCAPTCHA — не показываем (своя отправка через API) */
+    .b24-form-recaptcha,
+    .grecaptcha-badge,
+    textarea.g-recaptcha-response,
+    iframe[title='reCAPTCHA'] {
+      display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      max-height: 0 !important;
       overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      clip: rect(0, 0, 0, 0) !important;
+      border: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Bitrix-обёртка после подмены на нашу форму */
+    .b24-form-wrapper.feniks-replaced-b24-lead {
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* Кастомная форма заявки (вместо Bitrix) */
-    #contacts .feniks-form-shell {
+    #contacts .feniks-form-header, .feniks-lead-root .feniks-form-header {
+      text-align: center;
+      margin: 0 auto clamp(14px, 2vw, 22px);
+      max-width: 760px;
+      padding: clamp(18px, 2.5vw, 28px) clamp(16px, 3vw, 32px);
+      border-radius: 18px;
+      background: var(--feniks-green) !important;
+      border: 1px solid rgba(228, 196, 158, 0.28);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+      box-sizing: border-box;
+    }
+    /* Перебиваем Form_Wrap: иначе Form_Title — тот же #093333 на тёмном фоне */
+    #contacts .feniks-form-header [class*='Form_Title'],
+    .feniks-lead-root .feniks-form-header [class*='Form_Title'] {
+      color: #eee9e3 !important;
+    }
+    #contacts .feniks-form-header .feniks-form-lead,
+    .feniks-lead-root .feniks-form-header .feniks-form-lead {
+      margin: 10px auto 0;
+      max-width: 520px;
+      font-size: clamp(14px, 1.5vw, 16px);
+      line-height: 1.5;
+      color: rgba(238, 233, 227, 0.92) !important;
+      font-weight: 500;
+    }
+    #contacts .feniks-form-shell, .feniks-lead-root .feniks-form-shell {
       max-width: 760px;
       margin: 0 auto;
-      background: #eee9e3;
-      border: 1px solid rgba(9, 51, 51, 0.2);
-      border-radius: 18px;
-      padding: clamp(16px, 2vw, 26px);
-      box-shadow: 0 14px 30px rgba(9, 51, 51, 0.18);
+      background: linear-gradient(165deg, #f7f2eb 0%, #eee9e3 42%, #e8e0d6 100%);
+      border: 1px solid rgba(9, 51, 51, 0.18);
+      border-radius: 20px;
+      padding: clamp(18px, 2.2vw, 28px);
+      box-shadow:
+        0 18px 40px rgba(9, 51, 51, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65);
     }
-    #contacts .feniks-form-grid {
+    #contacts .feniks-form-feedback, .feniks-lead-root .feniks-form-feedback {
+      margin-bottom: 16px;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.45;
+      box-sizing: border-box;
+      animation: feniksFormFeedbackIn 0.38s ease;
+    }
+    @keyframes feniksFormFeedbackIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    #contacts .feniks-form-feedback--hidden, .feniks-lead-root .feniks-form-feedback--hidden {
+      display: none !important;
+    }
+    #contacts .feniks-form-feedback--success, .feniks-lead-root .feniks-form-feedback--success {
+      background: rgba(9, 51, 51, 0.07);
+      border: 1px solid rgba(9, 51, 51, 0.22);
+      color: #093333;
+    }
+    #contacts .feniks-form-feedback--error, .feniks-lead-root .feniks-form-feedback--error {
+      background: rgba(139, 40, 40, 0.07);
+      border: 1px solid rgba(139, 40, 40, 0.32);
+      color: #5a2222;
+    }
+    #contacts .feniks-form-feedback-inner, .feniks-lead-root .feniks-form-feedback-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    #contacts .feniks-form-feedback-icon, .feniks-lead-root .feniks-form-feedback-icon {
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(9, 51, 51, 0.12);
+      color: #093333;
+    }
+    #contacts .feniks-form-feedback--success .feniks-form-feedback-icon, .feniks-lead-root .feniks-form-feedback--success .feniks-form-feedback-icon {
+      background: rgba(9, 51, 51, 0.16);
+    }
+    #contacts .feniks-form-feedback-text strong, .feniks-lead-root .feniks-form-feedback-text strong {
+      display: block;
+      font-family: 'Philosopher', Candara, 'Segoe UI', Arial, sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.01em;
+    }
+    #contacts .feniks-form-feedback-text p, .feniks-lead-root .feniks-form-feedback-text p {
+      margin: 0;
+      opacity: 0.92;
+      font-size: 14px;
+    }
+    #contacts .feniks-form-feedback-dismiss, .feniks-lead-root .feniks-form-feedback-dismiss {
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(9, 51, 51, 0.28);
+      background: rgba(255, 255, 255, 0.55);
+      color: #093333;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #contacts .feniks-form-feedback-dismiss:hover, .feniks-lead-root .feniks-form-feedback-dismiss:hover {
+      background: rgba(255, 255, 255, 0.85);
+    }
+    #contacts .feniks-form-grid, .feniks-lead-root .feniks-form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
-    #contacts .feniks-form-field {
+    #contacts .feniks-form-field, .feniks-lead-root .feniks-form-field {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-    #contacts .feniks-form-field label {
-      font-size: 13px;
-      font-weight: 600;
+    #contacts .feniks-form-field label, .feniks-lead-root .feniks-form-field label {
+      font-size: 14px;
+      font-weight: 700;
       color: #093333;
+      letter-spacing: 0.01em;
     }
-    #contacts .feniks-form-field input {
+    #contacts .feniks-form-hint, .feniks-lead-root .feniks-form-hint {
+      display: block;
+      margin: -2px 0 2px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: rgba(32, 32, 31, 0.62);
+    }
+    #contacts .feniks-form-field input, .feniks-lead-root .feniks-form-field input {
       min-height: 48px;
       border-radius: 12px;
-      border: 1px solid rgba(9, 51, 51, 0.24);
+      border: 1px solid rgba(9, 51, 51, 0.22);
       background: #fff;
       color: #20201f;
       padding: 12px 14px;
       font-size: 16px;
       line-height: 1.25;
       box-sizing: border-box;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
-    #contacts .feniks-form-field input:focus {
-      outline: 2px solid rgba(9, 51, 51, 0.22);
-      outline-offset: 1px;
+    #contacts .feniks-form-field input:focus, .feniks-lead-root .feniks-form-field input:focus {
+      outline: none;
       border-color: #093333;
+      box-shadow: 0 0 0 3px rgba(9, 51, 51, 0.12);
     }
-    #contacts .feniks-form-field.feniks-form-full {
+    #contacts .feniks-form-field.feniks-form-full, .feniks-lead-root .feniks-form-field.feniks-form-full {
       grid-column: 1 / -1;
     }
-    #contacts .feniks-form-note {
-      margin-top: 10px;
+    #contacts .feniks-form-note, .feniks-lead-root .feniks-form-note {
+      margin-top: 12px;
       font-size: 12px;
-      line-height: 1.35;
-      color: rgba(32, 32, 31, 0.85);
+      line-height: 1.45;
+      color: rgba(32, 32, 31, 0.78);
     }
-    #contacts .feniks-form-submit {
-      margin-top: 14px;
+    #contacts .feniks-form-submit, .feniks-lead-root .feniks-form-submit {
+      margin-top: 16px;
       width: 100%;
-      min-height: 50px;
-      border-radius: 12px;
+      min-height: 52px;
+      border-radius: 14px;
       border: 1px solid #093333;
-      background: #093333;
+      background: linear-gradient(180deg, #0c3d3d 0%, #093333 100%);
       color: #eee9e3;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
+      font-family: 'Philosopher', Candara, 'Segoe UI', Arial, sans-serif;
+      letter-spacing: 0.02em;
+      box-shadow: 0 8px 20px rgba(9, 51, 51, 0.25);
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
     }
-    #contacts .feniks-form-submit:hover {
-      background: #0d4343;
+    #contacts .feniks-form-submit:hover:not(:disabled), .feniks-lead-root .feniks-form-submit:hover:not(:disabled) {
+      background: linear-gradient(180deg, #104747 0%, #0b3a3a 100%);
+      box-shadow: 0 10px 26px rgba(9, 51, 51, 0.3);
+      transform: translateY(-1px);
+    }
+    #contacts .feniks-form-submit:active:not(:disabled), .feniks-lead-root .feniks-form-submit:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    #contacts .feniks-form-submit:disabled, .feniks-lead-root .feniks-form-submit:disabled {
+      opacity: 0.72;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    #contacts .feniks-form-submit.is-loading, .feniks-lead-root .feniks-form-submit.is-loading {
+      cursor: wait;
     }
     @media (max-width: 743px) {
       #contacts [class*="Form_Inner"] {
@@ -739,15 +996,23 @@ const applyHeroBackground = (event) => {
       #contacts .b24-form-btn {
         min-height: 48px !important;
       }
-      #contacts .feniks-form-shell {
-        border-radius: 14px;
-        padding: 14px;
+      #contacts .feniks-form-shell, .feniks-lead-root .feniks-form-shell {
+        border-radius: 16px;
+        padding: 16px;
       }
-      #contacts .feniks-form-grid {
+      #contacts .feniks-form-feedback-inner, .feniks-lead-root .feniks-form-feedback-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      #contacts .feniks-form-feedback-icon, .feniks-lead-root .feniks-form-feedback-icon {
+        align-self: center;
+      }
+      #contacts .feniks-form-grid, .feniks-lead-root .feniks-form-grid {
         grid-template-columns: 1fr;
         gap: 10px;
       }
-      #contacts .feniks-form-submit {
+      #contacts .feniks-form-submit, .feniks-lead-root .feniks-form-submit {
         min-height: 48px;
       }
     }
@@ -1630,50 +1895,268 @@ const applyHeroBackground = (event) => {
     if (calcEl) calcEl.id = 'calculator'
   }
 
-  const replaceContactsForm = () => {
-    const formWrap = doc.querySelector('#contacts')
-    if (!formWrap || formWrap.dataset.feniksFormReplaced === '1') return
-    const inner = formWrap.querySelector('[class*="Form_Inner"]')
-    if (!inner) return
+  const stripB24Recaptcha = () => {
+    doc.querySelectorAll('.b24-form-recaptcha').forEach((el) => el.remove())
+    doc.querySelectorAll('.grecaptcha-badge').forEach((el) => el.remove())
+    doc.querySelectorAll('textarea.g-recaptcha-response').forEach((el) => el.remove())
+  }
 
-    inner.innerHTML = `
-      <div class="Form_Title__w4lDR">Заявка на франшизу</div>
+  let feniksLeadMountSeq = 0
+
+  const buildFeniksLeadRootHtml = (uid) => `
+      <div class="feniks-lead-root">
+      <div class="feniks-form-header">
+        <div class="Form_Title__w4lDR">Заявка на франшизу</div>
+        <p class="feniks-form-lead">Оставьте контакты — перезвоним и ответим на вопросы по пакету и запуску.</p>
+      </div>
       <div class="feniks-form-shell">
+        <div class="feniks-form-feedback feniks-form-feedback--hidden" role="status" aria-live="polite"></div>
         <form class="feniks-lead-form" novalidate>
           <div class="feniks-form-grid">
             <div class="feniks-form-field feniks-form-full">
-              <label for="feniks-fullname">ФИО</label>
-              <input id="feniks-fullname" name="fullName" type="text" required placeholder="Введите ФИО" />
+              <label for="feniks-fullname-${uid}">ФИО</label>
+              <span class="feniks-form-hint">Введите ФИО</span>
+              <input id="feniks-fullname-${uid}" name="fullName" type="text" required placeholder="Иванов Иван Иванович" autocomplete="name" />
             </div>
             <div class="feniks-form-field">
-              <label for="feniks-phone">Телефон</label>
-              <input id="feniks-phone" name="phone" type="tel" required placeholder="+7 (___) ___-__-__" />
+              <label for="feniks-phone-${uid}">Телефон</label>
+              <input id="feniks-phone-${uid}" name="phone" type="tel" required placeholder="+7 (___) ___-__-__" autocomplete="tel" />
             </div>
             <div class="feniks-form-field">
-              <label for="feniks-email">E-mail</label>
-              <input id="feniks-email" name="email" type="email" required placeholder="example@mail.ru" />
+              <label for="feniks-email-${uid}">E-mail</label>
+              <input id="feniks-email-${uid}" name="email" type="email" required placeholder="example@mail.ru" autocomplete="email" />
             </div>
             <div class="feniks-form-field feniks-form-full">
-              <label for="feniks-city">Город</label>
-              <input id="feniks-city" name="city" type="text" required placeholder="Введите город" />
+              <label for="feniks-city-${uid}">Город</label>
+              <input id="feniks-city-${uid}" name="city" type="text" required placeholder="Введите город" autocomplete="address-level2" />
             </div>
           </div>
           <div class="feniks-form-note">
             Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
           </div>
-          <button class="feniks-form-submit" type="submit">Отправить</button>
+          <button class="feniks-form-submit" type="submit">
+            <span class="feniks-form-submit-text">Отправить заявку</span>
+          </button>
         </form>
+      </div>
       </div>
     `
 
-    const form = inner.querySelector('.feniks-lead-form')
-    form?.addEventListener('submit', (event) => {
+  const bindFeniksLeadForm = (root) => {
+    const form = root.querySelector('.feniks-lead-form')
+    const feedbackEl = root.querySelector('.feniks-form-feedback')
+    if (!form || !feedbackEl) return
+    const successIconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    let feedbackHideTimer
+
+    const hideFeedback = () => {
+      if (!feedbackEl) return
+      clearTimeout(feedbackHideTimer)
+      feedbackEl.classList.add('feniks-form-feedback--hidden')
+      feedbackEl.innerHTML = ''
+      feedbackEl.removeAttribute('role')
+    }
+
+    const showFeedbackSuccess = () => {
+      if (!feedbackEl) return
+      clearTimeout(feedbackHideTimer)
+      feedbackEl.classList.remove('feniks-form-feedback--hidden', 'feniks-form-feedback--error')
+      feedbackEl.classList.add('feniks-form-feedback--success')
+      feedbackEl.setAttribute('role', 'status')
+      feedbackEl.innerHTML = `
+        <div class="feniks-form-feedback-inner">
+          <div class="feniks-form-feedback-icon">${successIconSvg}</div>
+          <div class="feniks-form-feedback-text">
+            <strong>Заявка отправлена</strong>
+            <p>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+            <button type="button" class="feniks-form-feedback-dismiss">Понятно</button>
+          </div>
+        </div>
+      `
+      const dismiss = feedbackEl.querySelector('.feniks-form-feedback-dismiss')
+      dismiss?.addEventListener('click', () => hideFeedback())
+      feedbackHideTimer = setTimeout(() => hideFeedback(), 8000)
+      feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+
+    const showFeedbackError = (message) => {
+      if (!feedbackEl) return
+      clearTimeout(feedbackHideTimer)
+      feedbackEl.classList.remove('feniks-form-feedback--hidden', 'feniks-form-feedback--success')
+      feedbackEl.classList.add('feniks-form-feedback--error')
+      feedbackEl.setAttribute('role', 'alert')
+      feedbackEl.innerHTML = ''
+      const wrap = doc.createElement('div')
+      wrap.className = 'feniks-form-feedback-inner'
+      const icon = doc.createElement('div')
+      icon.className = 'feniks-form-feedback-icon'
+      icon.setAttribute('aria-hidden', 'true')
+      icon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+      const text = doc.createElement('div')
+      text.className = 'feniks-form-feedback-text'
+      const strong = doc.createElement('strong')
+      strong.textContent = 'Не удалось отправить'
+      const p = doc.createElement('p')
+      p.textContent = message
+      text.append(strong, p)
+      wrap.append(icon, text)
+      feedbackEl.appendChild(wrap)
+      feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+
+    form.addEventListener('submit', async (event) => {
       event.preventDefault()
-      form.reset()
-      const msg = doc.defaultView?.alert
-      if (msg) msg('Спасибо! Ваша заявка отправлена.')
+      hideFeedback()
+      if (!form.checkValidity()) {
+        form.reportValidity()
+        return
+      }
+      const fd = new FormData(form)
+      const payload = {
+        fullName: String(fd.get('fullName') ?? '').trim(),
+        phone: String(fd.get('phone') ?? '').trim(),
+        email: String(fd.get('email') ?? '').trim(),
+        city: String(fd.get('city') ?? '').trim(),
+      }
+      const baseUrl = import.meta.env.VITE_FRANCHISE_LEAD_URL
+      const url =
+        typeof baseUrl === 'string' && baseUrl.length > 0
+          ? baseUrl
+          : '/api/v1/franchise/leads'
+      const submitBtn = form.querySelector('.feniks-form-submit')
+      const submitLabel = form.querySelector('.feniks-form-submit-text')
+      const defaultLabel = 'Отправить заявку'
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true
+          submitBtn.classList.add('is-loading')
+        }
+        if (submitLabel) submitLabel.textContent = 'Отправляем…'
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (res.ok) {
+          form.reset()
+          showFeedbackSuccess()
+          return
+        }
+        let message = 'Попробуйте позже или напишите нам на почту.'
+        try {
+          const err = await res.json()
+          if (err?.message) message = err.message
+        } catch {
+          /* ignore non-JSON body */
+        }
+        showFeedbackError(message)
+      } catch {
+        showFeedbackError('Нет связи с сервером. Проверьте подключение к интернету.')
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false
+          submitBtn.classList.remove('is-loading')
+        }
+        if (submitLabel) submitLabel.textContent = defaultLabel
+      }
     })
+  }
+
+  const replaceContactsForm = () => {
+    const formWrap = doc.querySelector('#contacts')
+    if (!formWrap || formWrap.dataset.feniksFormReplaced === '1') return
+    const inner = formWrap.querySelector('[class*="Form_Inner"]')
+    if (!inner) return
+    stripB24Recaptcha()
+    feniksLeadMountSeq += 1
+    const uid = `c${feniksLeadMountSeq}`
+    inner.innerHTML = buildFeniksLeadRootHtml(uid)
+    bindFeniksLeadForm(inner)
     formWrap.dataset.feniksFormReplaced = '1'
+    stripB24Recaptcha()
+  }
+
+  const replaceBitrixB24LeadWrappers = () => {
+    doc.querySelectorAll('.b24-form-wrapper').forEach((wrap) => {
+      if (wrap.dataset.feniksB24LeadReplaced === '1') return
+      if (wrap.querySelector('[class*="Form_Inner"]')) return
+      if (wrap.closest('.feniks-lead-root')) return
+      const title = wrap.querySelector('.b24-form-header-title')?.textContent?.trim() || ''
+      const hasPhoneField = !!wrap.querySelector('[class*="b24-form-field-phone"]')
+      const likelyLead = /заявк|отправить/i.test(title) || hasPhoneField
+      if (!likelyLead) return
+      wrap.dataset.feniksB24LeadReplaced = '1'
+      wrap.classList.add('feniks-replaced-b24-lead')
+      wrap.classList.remove('b24-form-shadow')
+      feniksLeadMountSeq += 1
+      const uid = `b${feniksLeadMountSeq}`
+      stripB24Recaptcha()
+      wrap.innerHTML = buildFeniksLeadRootHtml(uid)
+      bindFeniksLeadForm(wrap)
+      stripB24Recaptcha()
+    })
+  }
+
+  let lastLeadFormOpen = 0
+  const openLeadFormFromHero = () => {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
+    if (now - lastLeadFormOpen < 400) return
+    lastLeadFormOpen = now
+    setFeniksAnchorIds()
+    replaceContactsForm()
+    replaceBitrixB24LeadWrappers()
+    const target = doc.getElementById('contacts')
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      requestAnimationFrame(() => {
+        doc.querySelector('#contacts input[name="fullName"]')?.focus({ preventScroll: true })
+      })
+    }
+  }
+
+  /**
+   * React/Next перехватывает click на кнопке — слушатель на самой кнопке не срабатывает.
+   * Вешаем capture на document + pointerdown и click, stopImmediatePropagation.
+   */
+  const wireTitleScreenLeadButtons = () => {
+    if (doc.documentElement.dataset.feniksLeadHeroCapture === '1') return
+    doc.documentElement.dataset.feniksLeadHeroCapture = '1'
+
+    const shouldHandleButton = (btn) => {
+      if (!(btn instanceof HTMLButtonElement)) return false
+      if (btn.disabled) return false
+      if (btn.classList.contains('custom-cta')) return true
+      if (!btn.closest('[class*="TitleScreen_Buttons"]')) return false
+      const span = btn.querySelector('span')
+      const label = (span?.textContent || '').trim()
+      const cls = btn.className || ''
+      const isGreen =
+        cls.includes('Green48') ||
+        cls.includes('Button_Green') ||
+        /Green\d{2}/i.test(cls)
+      const labelSuggestsLead = /заявк|финмодел|финпоказател|финпоказ/i.test(label)
+      return isGreen || labelSuggestsLead
+    }
+
+    const intercept = (e) => {
+      const t = e.target
+      if (!(t instanceof Element)) return
+      const btn = t.closest('button')
+      if (!(btn instanceof HTMLButtonElement) || !shouldHandleButton(btn)) return
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      openLeadFormFromHero()
+    }
+
+    const win = doc.defaultView
+    if (win) {
+      win.addEventListener('pointerdown', intercept, true)
+      win.addEventListener('click', intercept, true)
+    } else {
+      doc.addEventListener('pointerdown', intercept, true)
+      doc.addEventListener('click', intercept, true)
+    }
   }
 
   const footerMenuNeedsPatch = (menuEl) =>
@@ -1799,12 +2282,16 @@ const applyHeroBackground = (event) => {
       )
     }
     let raf = 0
+    let debounceTimer = 0
     const obs = new MutationObserver(() => {
-      if (raf) win.cancelAnimationFrame(raf)
-      raf = win.requestAnimationFrame(() => {
-        raf = 0
-        patchFooter()
-      })
+      win.clearTimeout(debounceTimer)
+      debounceTimer = win.setTimeout(() => {
+        if (raf) win.cancelAnimationFrame(raf)
+        raf = win.requestAnimationFrame(() => {
+          raf = 0
+          patchFooter()
+        })
+      }, 120)
     })
     obs.observe(doc.body, {
       childList: true,
@@ -1818,13 +2305,29 @@ const applyHeroBackground = (event) => {
   setTimeout(patchFooter, 300)
   setTimeout(patchFooter, 1200)
   setupFooterContactObserver()
-  replaceContactsForm()
+  const iframeWin = doc.defaultView
+  const deferFeniksDomPatches = () => {
+    replaceContactsForm()
+    replaceBitrixB24LeadWrappers()
+    stripB24Recaptcha()
+  }
+  if (iframeWin) {
+    iframeWin.setTimeout(deferFeniksDomPatches, 150)
+  } else {
+    deferFeniksDomPatches()
+  }
   setTimeout(replaceContactsForm, 500)
   setTimeout(replaceContactsForm, 1500)
-
-  requestAnimationFrame(() => {
-    frameReady.value = true
-  })
+  setTimeout(replaceBitrixB24LeadWrappers, 350)
+  setTimeout(replaceBitrixB24LeadWrappers, 900)
+  setTimeout(replaceBitrixB24LeadWrappers, 1800)
+  setTimeout(stripB24Recaptcha, 400)
+  setTimeout(stripB24Recaptcha, 1200)
+  setTimeout(stripB24Recaptcha, 2500)
+  wireTitleScreenLeadButtons()
+  if (iframeEl?.tagName === 'IFRAME') {
+    iframeEl.__feniksScrollToLeadForm = openLeadFormFromHero
+  }
 }
 </script>
 
@@ -1841,12 +2344,120 @@ const applyHeroBackground = (event) => {
           <a href="#market">Рынок</a>
           <a href="#contacts">Контакты</a>
         </nav>
-        <button class="custom-cta" type="button">Оставить заявку</button>
+        <button class="custom-cta" type="button" @click="openLeadModal">Оставить заявку</button>
       </div>
     </header>
 
+    <Teleport to="body">
+      <div v-if="leadModalOpen" class="feniks-lead-modal-root" role="presentation">
+        <button
+          type="button"
+          class="feniks-lead-modal-backdrop"
+          aria-label="Закрыть окно"
+          tabindex="-1"
+          @click="closeLeadModal"
+        />
+        <div
+          class="feniks-lead-modal-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="feniks-lead-modal-title"
+          @click.stop
+        >
+          <button type="button" class="feniks-lead-modal-close" aria-label="Закрыть" @click="closeLeadModal">
+            ×
+          </button>
+          <div class="feniks-lead-modal-header">
+            <h2 id="feniks-lead-modal-title" class="feniks-lead-modal-title">Заявка на франшизу</h2>
+            <p class="feniks-lead-modal-lead">
+              Оставьте контакты — перезвоним и ответим на вопросы по пакету и запуску.
+            </p>
+          </div>
+          <div
+            v-if="leadModalFeedback === 'success'"
+            class="feniks-lead-modal-banner feniks-lead-modal-banner--success"
+            role="status"
+          >
+            <strong>Заявка отправлена</strong>
+            <p>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+            <button type="button" class="feniks-lead-modal-banner-btn" @click="closeLeadModal">Закрыть</button>
+          </div>
+          <div
+            v-else-if="leadModalFeedback === 'error'"
+            class="feniks-lead-modal-banner feniks-lead-modal-banner--error"
+            role="alert"
+          >
+            <strong>Не удалось отправить</strong>
+            <p>{{ leadModalErrorMsg }}</p>
+          </div>
+          <form
+            v-show="leadModalFeedback !== 'success'"
+            ref="leadModalFormRef"
+            class="feniks-lead-modal-form"
+            novalidate
+            @submit.prevent="submitLeadModal"
+          >
+            <div class="feniks-lead-modal-grid">
+              <div class="feniks-lead-modal-field feniks-lead-modal-field--full">
+                <label for="feniks-modal-fullname">ФИО</label>
+                <span class="feniks-lead-modal-hint">Введите ФИО</span>
+                <input
+                  id="feniks-modal-fullname"
+                  name="fullName"
+                  type="text"
+                  required
+                  placeholder="Иванов Иван Иванович"
+                  autocomplete="name"
+                />
+              </div>
+              <div class="feniks-lead-modal-field">
+                <label for="feniks-modal-phone">Телефон</label>
+                <input
+                  id="feniks-modal-phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  placeholder="+7 (___) ___-__-__"
+                  autocomplete="tel"
+                />
+              </div>
+              <div class="feniks-lead-modal-field">
+                <label for="feniks-modal-email">E-mail</label>
+                <input
+                  id="feniks-modal-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="example@mail.ru"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="feniks-lead-modal-field feniks-lead-modal-field--full">
+                <label for="feniks-modal-city">Город</label>
+                <input
+                  id="feniks-modal-city"
+                  name="city"
+                  type="text"
+                  required
+                  placeholder="Введите город"
+                  autocomplete="address-level2"
+                />
+              </div>
+            </div>
+            <p class="feniks-lead-modal-note">
+              Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
+            </p>
+            <button class="feniks-lead-modal-submit" type="submit" :disabled="leadModalSubmitting">
+              <span>{{ leadModalSubmitting ? 'Отправляем…' : 'Отправить заявку' }}</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </Teleport>
+
     <div class="legacy-shell">
       <iframe
+        ref="legacyFrameRef"
         class="legacy-frame"
         :class="{ 'legacy-frame-ready': frameReady }"
         :src="frameSrc"

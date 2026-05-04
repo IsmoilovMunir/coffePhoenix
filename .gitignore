@@ -48,3 +48,25 @@ authorized_keys
 # Local deploy overrides
 deploy/*.local.*
 scripts/*.local.*
+
+# Vite / frontend caches (не коммитить)
+.vite/
+**/.vite/
+
+# TypeScript incremental
+*.tsbuildinfo
+
+# Spring Boot — локальные конфиги с секретами / машинными URL
+**/application-local.yml
+**/application-local.properties
+**/application-secret.yml
+**/application-*-local.yml
+
+# JVM crash dumps / heap
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
+
+# Доп. служебные файлы ОС
+.AppleDouble
+Desktop.ini

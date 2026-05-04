@@ -222,3 +222,214 @@ html:has(.franchise-page) #app {
 .legacy-frame.legacy-frame-ready {
   opacity: 1;
 }
+
+/* Модальное окно заявки (кнопка custom-cta в шапке Vue) */
+.feniks-lead-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+.feniks-lead-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: rgba(9, 51, 51, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.feniks-lead-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: min(92dvh, 720px);
+  overflow-y: auto;
+  border-radius: 20px;
+  background: linear-gradient(165deg, #f7f2eb 0%, #eee9e3 42%, #e8e0d6 100%);
+  border: 1px solid rgba(9, 51, 51, 0.18);
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.feniks-lead-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(9, 51, 51, 0.08);
+  color: var(--brand-green);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.feniks-lead-modal-close:hover {
+  background: rgba(9, 51, 51, 0.14);
+}
+
+.feniks-lead-modal-header {
+  text-align: center;
+  padding: clamp(18px, 2.5vw, 26px) clamp(40px, 6vw, 48px) clamp(16px, 2vw, 22px);
+  border-radius: 20px 20px 0 0;
+  background: var(--brand-green);
+  border-bottom: 1px solid rgba(228, 196, 158, 0.28);
+}
+
+.feniks-lead-modal-title {
+  margin: 0;
+  font-family: 'Philosopher', Candara, 'Segoe UI', Arial, sans-serif;
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--brand-ivory);
+  letter-spacing: 0.01em;
+}
+
+.feniks-lead-modal-lead {
+  margin: 10px auto 0;
+  max-width: 420px;
+  font-size: clamp(14px, 1.5vw, 16px);
+  line-height: 1.5;
+  color: rgba(238, 233, 227, 0.92);
+  font-weight: 500;
+}
+
+.feniks-lead-modal-banner {
+  margin: 16px 20px 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.feniks-lead-modal-banner strong {
+  display: block;
+  font-family: 'Philosopher', Candara, 'Segoe UI', Arial, sans-serif;
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.feniks-lead-modal-banner p {
+  margin: 0;
+}
+
+.feniks-lead-modal-banner--success {
+  background: rgba(9, 51, 51, 0.08);
+  border: 1px solid rgba(9, 51, 51, 0.22);
+  color: var(--brand-green);
+}
+
+.feniks-lead-modal-banner--error {
+  background: rgba(139, 40, 40, 0.08);
+  border: 1px solid rgba(139, 40, 40, 0.28);
+  color: #5a2222;
+}
+
+.feniks-lead-modal-banner-btn {
+  margin-top: 12px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(9, 51, 51, 0.25);
+  background: var(--brand-green);
+  color: var(--brand-ivory);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.feniks-lead-modal-form {
+  padding: 18px 20px 8px;
+}
+
+.feniks-lead-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+@media (max-width: 520px) {
+  .feniks-lead-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feniks-lead-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.feniks-lead-modal-field--full {
+  grid-column: 1 / -1;
+}
+
+.feniks-lead-modal-field label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--brand-green);
+}
+
+.feniks-lead-modal-hint {
+  font-size: 12px;
+  color: rgba(32, 32, 31, 0.62);
+  margin-top: -2px;
+}
+
+.feniks-lead-modal-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(9, 51, 51, 0.24);
+  background: #fff;
+  color: var(--brand-graphite);
+  font-size: 16px;
+  font-family: Candara, 'Philosopher', 'Segoe UI', Arial, sans-serif;
+}
+
+.feniks-lead-modal-field input:focus {
+  outline: 2px solid rgba(9, 51, 51, 0.22);
+  outline-offset: 1px;
+  border-color: var(--brand-green);
+}
+
+.feniks-lead-modal-note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(32, 32, 31, 0.72);
+}
+
+.feniks-lead-modal-submit {
+  margin-top: 18px;
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--brand-green);
+  border-radius: 12px;
+  background: var(--brand-green);
+  color: var(--brand-ivory);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.feniks-lead-modal-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

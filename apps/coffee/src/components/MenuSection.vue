@@ -6,18 +6,28 @@ import cappuccinoImg from "../assets/img/cappuccino.png";
 import latteImg from "../assets/img/latte.png";
 import flatWhiteImg from "../assets/img/flat-white.png";
 import rafImg from "../assets/img/raf.png";
-import mocaccinoImg from "../assets/img/mocaccino.png";
-import hotChocolateImg from "../assets/img/mocaccino.png";
-import seaBuckthornImg from "../assets/img/sea-buckthorn.png";
-import raspberryMulledImg from "../assets/img/raspberry-mulled.png";
-import lingonberryJasmineTeaImg from "../assets/img/lingonberry-jasmine-tea.png";
-import berryIceTeaImg from "../assets/img/berry-ice-tea.png";
-import classicBerryTeaImg from "../assets/img/classic-berry-tea.png";
-import berryCardamomImg from "../assets/img/berry-cardamom.png";
-import jasmineRafImg from "../assets/img/jasmine-raf.png";
-import mapleRafImg from "../assets/img/maple-raf.png";
-import meltingLatteImg from "../assets/img/melting-latte.png";
-import berryMintMocaccinoImg from "../assets/img/berry-mint-mocaccino.png";
+import bumbelImg from "../assets/img/bumbel.png";
+import glyasImg from "../assets/img/glyas.png";
+import kakaoImg from "../assets/img/kakao.png";
+import matchaImg from "../assets/img/matcha.png";
+import chayListovImg from "../assets/img/chay-listov.png";
+import chayShafranImg from "../assets/img/chay-shafran.png";
+import hotChocolateImg from "../assets/img/goryachi-shokolad.png";
+import kofeFeniksImg from "../assets/img/kofe-feniks.png";
+import rafHalvaImg from "../assets/img/raf-xalva.png";
+import latteBauntImg from "../assets/img/latte-baunt.png";
+import latteLukumImg from "../assets/img/lake-lukum.png";
+import yagodnayaMatchaImg from "../assets/img/yagadnayz-match.png";
+import mangoMatchImg from "../assets/img/mango-match.png";
+import shirChayImg from "../assets/img/shirchay.png";
+import chayKlukaviyImg from "../assets/img/chay-klukaviy.png";
+import shokaladImg from "../assets/img/shokalad.png";
+import klubnichniyImg from "../assets/img/klubnichniy.png";
+import limonadLavandaImg from "../assets/img/limonad lavanda.png";
+import limonadEzhevikaImg from "../assets/img/limonad ezhevika.png";
+import citrusoviyImg from "../assets/img/citrusoviy.png";
+import maxitoImg from "../assets/img/maxito.png";
+import silivochniyImg from "../assets/img/silivochniy.png";
 
 const activeTab = ref("coffee");
 
@@ -26,7 +36,7 @@ const coffeeDrinks = [
     area: "a",
     name: "Эспрессо",
     sizes: [
-      { volume: "200 мл", price: 190 },
+      { volume: "200 мл", price: 230 },
     ],
     img: espressoImg,
   },
@@ -34,9 +44,9 @@ const coffeeDrinks = [
     area: "b",
     name: "Американо",
     sizes: [
-      { volume: "200 мл", price: 190 },
-      { volume: "300 мл", price: 210 },
-      { volume: "400 мл", price: 230 },
+      { volume: "200 мл", price: 210 },
+      { volume: "300 мл", price: 230 },
+      { volume: "400 мл", price: 260 },
     ],
     img: americanoImg,
   },
@@ -44,9 +54,9 @@ const coffeeDrinks = [
     area: "c",
     name: "Капучино",
     sizes: [
-      { volume: "200 мл", price: 240 },
-      { volume: "300 мл", price: 260 },
-      { volume: "400 мл", price: 310 },
+      { volume: "200 мл", price: 290 },
+      { volume: "300 мл", price: 330 },
+      { volume: "400 мл", price: 370 },
     ],
     img: cappuccinoImg,
   },
@@ -54,9 +64,9 @@ const coffeeDrinks = [
     area: "d",
     name: "Латте",
     sizes: [
-      { volume: "200 мл", price: 240 },
-      { volume: "300 мл", price: 260 },
-      { volume: "400 мл", price: 310 },
+      { volume: "200 мл", price: 290 },
+      { volume: "300 мл", price: 330 },
+      { volume: "400 мл", price: 370 },
     ],
     img: latteImg,
   },
@@ -64,7 +74,7 @@ const coffeeDrinks = [
     area: "e",
     name: "Флет уайт",
     sizes: [
-      { volume: "400 мл", price: 310 },
+      { volume: "400 мл", price: 340 },
     ],
     img: flatWhiteImg,
   },
@@ -73,21 +83,23 @@ const coffeeDrinks = [
     name: "Раф",
     featured: true,
     sizes: [
-      { volume: "200 мл", price: 300 },
-      { volume: "300 мл", price: 330 },
-      { volume: "400 мл", price: 360 },
+      { volume: "200 мл", price: 330 },
+      { volume: "300 мл", price: 360 },
+      { volume: "400 мл", price: 390 },
     ],
     img: rafImg,
   },
   {
     area: "g",
-    name: "Моккачино",
-    sizes: [
-      { volume: "200 мл", price: 260 },
-      { volume: "300 мл", price: 290 },
-      { volume: "400 мл", price: 330 },
-    ],
-    img: mocaccinoImg,
+    name: "Бамбл",
+    sizes: [{ volume: "300 мл", price: 390 }],
+    img: bumbelImg,
+  },
+  {
+    area: "glace",
+    name: "Глясе",
+    sizes: [{ volume: "300 мл", price: 350 }],
+    img: glyasImg,
   },
 ];
 
@@ -95,33 +107,38 @@ const nonCoffeeDrinks = [
   {
     area: "a",
     name: "Какао",
-    sizes: [{ volume: "200 мл", price: 190 }],
-    img: "https://images.unsplash.com/photo-1517578239113-b03992dcdd25?auto=format&fit=crop&w=600&q=80",
+    sizes: [
+      { volume: "300 мл", price: 220 },
+      { volume: "400 мл", price: 250 },
+    ],
+    img: kakaoImg,
   },
   {
     area: "b",
     name: "Матча",
     sizes: [
-      { volume: "200 мл", price: 190 },
-      { volume: "300 мл", price: 210 },
-      { volume: "400 мл", price: 230 },
+      { volume: "200 мл", price: 220 },
+      { volume: "300 мл", price: 240 },
+      { volume: "400 мл", price: 260 },
     ],
-    img: "https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?auto=format&fit=crop&w=600&q=80",
+    img: matchaImg,
   },
   {
     area: "c",
     name: "Чай листовой",
-    sizes: [
-      { volume: "200 мл", price: 140 },
-      { volume: "300 мл", price: 170 },
-      { volume: "400 мл", price: 190 },
-    ],
-    img: "https://images.unsplash.com/photo-1523920290228-4f321a939b4c?auto=format&fit=crop&w=600&q=80",
+    sizes: [{ volume: "400 мл", price: 210 }],
+    img: chayListovImg,
   },
   {
     area: "d",
+    name: "Чай шафран / кардамон",
+    sizes: [{ volume: "400 мл", price: 250 }],
+    img: chayShafranImg,
+  },
+  {
+    area: "e",
     name: "Горячий шоколад",
-    sizes: [{ volume: "300 мл", price: 210 }],
+    sizes: [{ volume: "300 мл", price: 270 }],
     img: hotChocolateImg,
   },
 ];
@@ -129,63 +146,99 @@ const nonCoffeeDrinks = [
 const signatureCoffee = [
   {
     area: "a",
-    name: "Облепиха / лаванда",
-    sizes: [{ volume: "400 мл", price: 280 }],
-    img: seaBuckthornImg,
+    name: "Кофе «Феникс»",
+    sizes: [{ volume: "400 мл", price: 430 }],
+    img: kofeFeniksImg,
   },
   {
     area: "b",
-    name: "Малиновый глинтвейн",
-    sizes: [{ volume: "400 мл", price: 280 }],
-    img: raspberryMulledImg,
+    name: "Раф халва",
+    sizes: [
+      { volume: "300 мл", price: 390 },
+      { volume: "400 мл", price: 420 },
+    ],
+    img: rafHalvaImg,
   },
   {
     area: "c",
-    name: "Чай «брусника-жасмин»",
-    sizes: [{ volume: "400 мл", price: 280 }],
-    img: lingonberryJasmineTeaImg,
+    name: "Латте «Баунти»",
+    sizes: [{ volume: "400 мл", price: 370 }],
+    img: latteBauntImg,
   },
   {
     area: "d",
-    name: "Ягодный айс-ти с ромашкой",
-    sizes: [{ volume: "400 мл", price: 280 }],
-    img: berryIceTeaImg,
+    name: "Латте «Лукум»",
+    sizes: [{ volume: "400 мл", price: 290 }],
+    img: latteLukumImg,
   },
   {
     area: "e",
-    name: "Ягодный чай классический",
-    sizes: [{ volume: "400 мл", price: 190 }],
-    img: classicBerryTeaImg,
+    name: "Ягодная матча",
+    sizes: [{ volume: "300 мл", price: 270 }],
+    img: yagodnayaMatchaImg,
   },
   {
     area: "f",
-    name: "Ягодный с кардамоном",
-    sizes: [{ volume: "400 мл", price: 280 }],
-    img: berryCardamomImg,
+    name: "Манго матча",
+    sizes: [{ volume: "300 мл", price: 270 }],
+    img: mangoMatchImg,
   },
   {
     area: "g",
-    name: "Раф жасминовый",
-    sizes: [{ volume: "400 мл", price: 370 }],
-    img: jasmineRafImg,
+    name: "Шир чай",
+    sizes: [{ volume: "300 мл", price: 250 }],
+    img: shirChayImg,
   },
   {
     area: "h",
-    name: "Кленовый раф",
-    sizes: [{ volume: "400 мл", price: 370 }],
-    img: mapleRafImg,
+    name: "Чай клюква / можжевельник",
+    sizes: [{ volume: "300 мл", price: 250 }],
+    img: chayKlukaviyImg,
+  },
+];
+
+const lemonadeShakes = [
+  {
+    area: "a",
+    name: "Шоколадный милкшейк",
+    sizes: [{ volume: "400 мл", price: 409 }],
+    img: shokaladImg,
   },
   {
-    area: "i",
-    name: "Латте «Тающий пломбир»",
-    sizes: [{ volume: "400 мл", price: 370 }],
-    img: meltingLatteImg,
+    area: "b",
+    name: "Клубничный милкшейк",
+    sizes: [{ volume: "400 мл", price: 409 }],
+    img: klubnichniyImg,
   },
   {
-    area: "j",
-    name: "Моккачино ягодно-мятный",
-    sizes: [{ volume: "400 мл", price: 370 }],
-    img: berryMintMocaccinoImg,
+    area: "c",
+    name: "Лимонад лаванда / тоник",
+    sizes: [{ volume: "400 мл", price: 310 }],
+    img: limonadLavandaImg,
+  },
+  {
+    area: "d",
+    name: "Лимонад ежевика / мята",
+    sizes: [{ volume: "400 мл", price: 310 }],
+    img: limonadEzhevikaImg,
+  },
+  {
+    area: "e",
+    name: "Цитрусовый лимонад",
+    sizes: [{ volume: "400 мл", price: 310 }],
+    img: citrusoviyImg,
+  },
+  {
+    area: "f",
+    name: "Мохито",
+    sizes: [{ volume: "400 мл", price: 290 }],
+    img: maxitoImg,
+  },
+  {
+    area: "g",
+    name: "Сливочное пиво",
+    sizes: [{ volume: "400 мл", price: 430 }],
+    img: silivochniyImg,
   },
 ];
 
@@ -259,7 +312,9 @@ const kitchen = [
 const currentItems = computed(() => {
   if (activeTab.value === "coffee") return coffeeDrinks;
   if (activeTab.value === "signature") return signatureCoffee;
-  return nonCoffeeDrinks;
+  if (activeTab.value === "nonCoffee") return nonCoffeeDrinks;
+  if (activeTab.value === "lemonades") return lemonadeShakes;
+  return coffeeDrinks;
 });
 </script>
 
@@ -270,6 +325,7 @@ const currentItems = computed(() => {
     :class="{
       'menu-section--signature': activeTab === 'signature',
       'menu-section--coffee': activeTab === 'coffee',
+      'menu-section--lemonades': activeTab === 'lemonades',
     }"
     aria-labelledby="menu-heading"
   >
@@ -297,7 +353,7 @@ const currentItems = computed(() => {
             :aria-selected="activeTab === 'signature'"
             @click="activeTab = 'signature'"
           >
-            Авторское 400 мл
+            Авторское
           </button>
           <button
             type="button"
@@ -307,6 +363,15 @@ const currentItems = computed(() => {
             @click="activeTab = 'nonCoffee'"
           >
             Не кофе
+          </button>
+          <button
+            type="button"
+            class="menu-section__tab"
+            role="tab"
+            :aria-selected="activeTab === 'lemonades'"
+            @click="activeTab = 'lemonades'"
+          >
+            Лимонады / шейки
           </button>
         </div>
 
@@ -323,8 +388,10 @@ const currentItems = computed(() => {
           activeTab === 'coffee'
             ? 'Кофе'
             : activeTab === 'signature'
-              ? 'Авторское 400 мл'
-              : 'Не кофе'
+              ? 'Авторское'
+              : activeTab === 'nonCoffee'
+                ? 'Не кофе'
+                : 'Лимонады / шейки'
         "
       >
         <article
