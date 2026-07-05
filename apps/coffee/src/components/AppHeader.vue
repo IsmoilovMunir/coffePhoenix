@@ -62,6 +62,7 @@ onUnmounted(() => {
             <a href="#hero" @click="closeNav">Главная</a>
           </li>
           <li><a href="#story" @click="closeNav">О нас</a></li>
+          <li><a href="#team" @click="closeNav">Команда</a></li>
           <li><a href="#menu" @click="closeNav">Ассортимент</a></li>
           <li><a href="#contacts" @click="closeNav">Контакты</a></li>
           <li class="nav__extra"><a href="#cafes" @click="closeNav">Кофейни</a></li>

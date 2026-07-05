@@ -3,6 +3,7 @@ import { ref, provide, onMounted, onUnmounted } from "vue";
 import AppHeader from "./components/AppHeader.vue";
 import HeroSection from "./components/HeroSection.vue";
 import BrandStorySection from "./components/BrandStorySection.vue";
+import TeamSection from "./components/TeamSection.vue";
 import MenuSection from "./components/MenuSection.vue";
 import TimelineSection from "./components/TimelineSection.vue";
 import CafesStrip from "./components/CafesStrip.vue";
@@ -47,6 +48,7 @@ onUnmounted(() => {
     <HeroSection />
   </div>
   <BrandStorySection />
+  <TeamSection />
   <main>
     <MenuSection />
     <TimelineSection />
